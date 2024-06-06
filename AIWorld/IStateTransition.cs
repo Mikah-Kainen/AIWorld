@@ -8,5 +8,6 @@ namespace AIWorld
 {
     public interface IStateTransition<TransitionData>
     {
+        public TransitionData GetData();
     }
 }

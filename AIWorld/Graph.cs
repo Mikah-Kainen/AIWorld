@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,7 +65,7 @@ namespace AIWorld
         public int CompareTo(Edge<NodeData, EdgeData> targetEdge) { return this.CompareTo(targetEdge); }
     }
 
-    public class Graph<NodeData, EdgeData> : IStateProvider<NodeData, EdgeData>
+    public class Graph<NodeData, EdgeData> : IStateProvider<Node<NodeData, EdgeData>, NodeData, Edge<NodeData, EdgeData>, EdgeData>
         where NodeData : IComparable<NodeData>
         where EdgeData : IComparable<EdgeData>
     {
@@ -145,9 +146,27 @@ namespace AIWorld
             return newEdge;
         }
 
-        public List<Edge<NodeData, EdgeData>> GetSuccessors(Node<NodeData, EdgeData> currentNode)
+        public List<IStateTransition<EdgeData>> GetSuccessors(IStateMarker<NodeData> stateMarker)
         {
-            return currentNode.GetEdges();
+            Node<NodeData, EdgeData> currentNode = (Node<NodeData, EdgeData>)stateMarker;
+            List<IStateTransition<EdgeData>> returnList = new();
+            if (nodes.Contains(currentNode))
+            {
+                foreach (Edge<NodeData, EdgeData> edge in currentNode.GetEdges())
+                {
+                    returnList.Add(edge);
+                }    
+            }
+            return returnList;
+        }
+
+        public List<Edge<NodeData, EdgeData>> GetSuccessors(Node<NodeData, EdgeData> stateMarker)
+        {
+            if (nodes.Contains(stateMarker))
+            {
+                return stateMarker.GetEdges();
+            }
+            return new List<Edge<NodeData, EdgeData>>();
         }
     }
 }

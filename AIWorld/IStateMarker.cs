@@ -8,5 +8,6 @@ namespace AIWorld
 {
     public interface IStateMarker<StateData>
     {
+        public StateData GetData();
     }
 }

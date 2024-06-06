@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace AIWorld
 {
-    public interface IStateProvider<StateData, TransitionData>
+    public interface IStateProvider<TStateMarker, StateData, TStateTransition, TransitionData>
+        where TStateMarker : IStateMarker<StateData>
+        where TStateTransition : IStateTransition<TransitionData>
     {
-        public List<IStateTransition<TransitionData>> GetSuccessors(IStateMarker<StateData> stateMarker);
+        public List<TStateTransition> GetSuccessors(TStateMarker stateMarker);
+        //List<Func<StateData, bool>> GetTransitionConditions(IAgent agent);
     }
 }
