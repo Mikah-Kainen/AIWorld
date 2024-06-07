@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIWorld
+namespace AIWorld.Environment
 {
-    public class Agent
+    public interface IStateMarker<StateData>
     {
+        public StateData GetData();
     }
 }

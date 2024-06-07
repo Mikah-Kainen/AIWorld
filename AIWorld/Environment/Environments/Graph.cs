@@ -5,19 +5,19 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AIWorld
+namespace AIWorld.Environment.Environments
 {
     public class Node<NodeData, EdgeData> : IStateMarker<NodeData>
         where NodeData : IComparable<NodeData>
         where EdgeData : IComparable<EdgeData>
     {
         private NodeData data;
-        private List<Edge<NodeData, EdgeData>> edges;
+        private HashSet<Edge<NodeData, EdgeData>> edges;
 
         public Node(NodeData data)
         {
             this.data = data;
-            this.edges = new List<Edge<NodeData, EdgeData>>();
+            edges = new HashSet<Edge<NodeData, EdgeData>>();
         }
 
         public void AddEdge(Node<NodeData, EdgeData> endNode, EdgeData edgeData)
@@ -27,13 +27,13 @@ namespace AIWorld
 
         public NodeData GetData() { return data; }
 
-        public List<Edge<NodeData, EdgeData>> GetEdges() { return edges; }
+        public HashSet<Edge<NodeData, EdgeData>> GetEdges() { return edges; }
 
         public bool IsConnected(Node<NodeData, EdgeData> targetNode)
         {
-            for (int i = 0; i < edges.Count; i ++)
+            foreach (Edge<NodeData, EdgeData> edge in edges)
             {
-                if (edges[i].GetEndNode() == targetNode)
+                if (edge.GetEndNode() == targetNode)
                 {
                     return true;
                 }
@@ -41,10 +41,10 @@ namespace AIWorld
             return false;
         }
 
-        public int CompareTo(Node<NodeData, EdgeData> targetNode) { return this.CompareTo(targetNode); } 
+        public int CompareTo(Node<NodeData, EdgeData> targetNode) { return CompareTo(targetNode); }
     }
 
-    public class Edge<NodeData, EdgeData> : IStateTransition<EdgeData>
+    public class Edge<NodeData, EdgeData> : IStateTransition<NodeData, EdgeData>
         where NodeData : IComparable<NodeData>
         where EdgeData : IComparable<EdgeData>
     {
@@ -58,47 +58,48 @@ namespace AIWorld
             endNode = edgeEndNode;
             data = edgeData;
         }
-
+        public IStateMarker<NodeData> GetStartState() { return startNode; }
+        public IStateMarker<NodeData> GetEndState() { return endNode; }
         public Node<NodeData, EdgeData> GetStartNode() { return startNode; }
-        public Node<NodeData, EdgeData> GetEndNode() {  return endNode; }
+        public Node<NodeData, EdgeData> GetEndNode() { return endNode; }
         public EdgeData GetData() { return data; }
-        public int CompareTo(Edge<NodeData, EdgeData> targetEdge) { return this.CompareTo(targetEdge); }
+        public int CompareTo(Edge<NodeData, EdgeData> targetEdge) { return CompareTo(targetEdge); }
     }
 
     public class Graph<NodeData, EdgeData> : IStateProvider<Node<NodeData, EdgeData>, NodeData, Edge<NodeData, EdgeData>, EdgeData>
         where NodeData : IComparable<NodeData>
         where EdgeData : IComparable<EdgeData>
     {
-        private List<Node<NodeData, EdgeData>> nodes;
-        private List<Edge<NodeData, EdgeData>> edges;
+        private HashSet<Node<NodeData, EdgeData>> nodes;
+        private HashSet<Edge<NodeData, EdgeData>> edges;
 
         public Graph()
         {
-            nodes = new List<Node<NodeData, EdgeData>>();
-            edges = new List<Edge<NodeData, EdgeData>>();
+            nodes = new HashSet<Node<NodeData, EdgeData>>();
+            edges = new HashSet<Edge<NodeData, EdgeData>>();
         }
 
         public int GetCount() { return nodes.Count; }
-        public List<Node<NodeData, EdgeData>> GetNodes() { return nodes; }
-        public List<Edge<NodeData, EdgeData>> GetEdges() { return edges; }
+        public HashSet<Node<NodeData, EdgeData>> GetNodes() { return nodes; }
+        public HashSet<Edge<NodeData, EdgeData>> GetEdges() { return edges; }
         public bool Contains(Node<NodeData, EdgeData> node) { return nodes.Contains(node); }
-        public List<Node<NodeData, EdgeData>> GetNodes(NodeData nodeData)
+        public HashSet<Node<NodeData, EdgeData>> GetNodes(NodeData nodeData)
         {
-            List<Node<NodeData, EdgeData>> returnList = new List<Node<NodeData, EdgeData>>();
-            for (int i = 0; i < nodes.Count; i++)
+            HashSet<Node<NodeData, EdgeData>> returnSet = new HashSet<Node<NodeData, EdgeData>>();
+            foreach (Node<NodeData, EdgeData> node in nodes)
             {
-                if (nodes[i].GetData().CompareTo(nodeData) == 0)
+                if (node.GetData().CompareTo(nodeData) == 0)
                 {
-                    returnList.Add(nodes[i]);
+                    returnSet.Add(node);
                 }
             }
-            return returnList;
+            return returnSet;
         }
         public int Contains(NodeData nodeData) { return GetNodes(nodeData).Count; }
-        public List<Edge<NodeData, EdgeData>> GetEdges(NodeData startNodeData, NodeData endNodeData)
+        public HashSet<Edge<NodeData, EdgeData>> GetEdges(NodeData startNodeData, NodeData endNodeData)
         {
-            List<Edge<NodeData, EdgeData>> returnEdges = new List<Edge<NodeData, EdgeData>>();
-            List<Node<NodeData, EdgeData>> startNodes = GetNodes(startNodeData);
+            HashSet<Edge<NodeData, EdgeData>> returnEdges = new HashSet<Edge<NodeData, EdgeData>>();
+            HashSet<Node<NodeData, EdgeData>> startNodes = GetNodes(startNodeData);
             if (startNodes.Count == 0)
             {
                 return returnEdges;
@@ -117,7 +118,7 @@ namespace AIWorld
             return returnEdges;
         }
         public int AreConnected(NodeData startNodeData, NodeData endNodeData) { return GetEdges(startNodeData, endNodeData).Count(); }
-        public Node<NodeData, EdgeData> AddNode(NodeData nodeData) 
+        public Node<NodeData, EdgeData> AddNode(NodeData nodeData)
         {
             Node<NodeData, EdgeData> newNode = new Node<NodeData, EdgeData>(nodeData);
             nodes.Add(newNode);
@@ -125,7 +126,7 @@ namespace AIWorld
         }
         public Edge<NodeData, EdgeData> AddEdge(Node<NodeData, EdgeData> startNode, Node<NodeData, EdgeData> endNode, EdgeData edgeData)
         {
-            if(!Contains(startNode))
+            if (!Contains(startNode))
             {
                 throw new Exception("StartNode not in Graph");
             }
@@ -146,27 +147,27 @@ namespace AIWorld
             return newEdge;
         }
 
-        public List<IStateTransition<EdgeData>> GetSuccessors(IStateMarker<NodeData> stateMarker)
+        public HashSet<IStateTransition<NodeData, EdgeData>> GetSuccessors(IStateMarker<NodeData> stateMarker)
         {
             Node<NodeData, EdgeData> currentNode = (Node<NodeData, EdgeData>)stateMarker;
-            List<IStateTransition<EdgeData>> returnList = new();
+            HashSet<IStateTransition<NodeData, EdgeData>> returnSet = new HashSet<IStateTransition<NodeData, EdgeData>>();
             if (nodes.Contains(currentNode))
             {
                 foreach (Edge<NodeData, EdgeData> edge in currentNode.GetEdges())
                 {
-                    returnList.Add(edge);
-                }    
+                    returnSet.Add(edge);
+                }
             }
-            return returnList;
+            return returnSet;
         }
 
-        public List<Edge<NodeData, EdgeData>> GetSuccessors(Node<NodeData, EdgeData> stateMarker)
+        public HashSet<Edge<NodeData, EdgeData>> GetSuccessors(Node<NodeData, EdgeData> stateMarker)
         {
             if (nodes.Contains(stateMarker))
             {
                 return stateMarker.GetEdges();
             }
-            return new List<Edge<NodeData, EdgeData>>();
+            return new HashSet<Edge<NodeData, EdgeData>>();
         }
     }
 }
