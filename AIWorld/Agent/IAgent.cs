@@ -7,12 +7,12 @@ using AIWorld.Environment;
 
 namespace AIWorld.Agent
 {
-    public interface IAgent<StateData, TransitionData>
-        where StateData : IComparable<StateData>
-        where TransitionData : IComparable<TransitionData>
+    public interface IAgent<TStateData, TTransitionData>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
     {
-        IStateMarker<StateData> GetState();
-        IEnvironment<StateData, TransitionData> GetEnvironment();
-        IStateTransition<StateData, TransitionData> Selector(HashSet<IStateTransition<StateData, TransitionData>> choices);
+        IStateMarker<TStateData> GetState();
+        IEnvironment<TStateData, TTransitionData> GetEnvironment();
+        IStateTransition<TStateData, TTransitionData> Selector(HashSet<IStateTransition<TStateData, TTransitionData>> choices);
     }
 }

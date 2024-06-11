@@ -7,31 +7,31 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment.Environments
 {
-    public class Node<NodeData, EdgeData> : IStateMarker<NodeData>
-        where NodeData : IComparable<NodeData>
-        where EdgeData : IComparable<EdgeData>
+    public class Node<TNodeData, TEdgeData> : IStateMarker<TNodeData>
+        where TNodeData : IComparable<TNodeData>
+        where TEdgeData : IComparable<TEdgeData>
     {
-        private NodeData data;
-        private HashSet<Edge<NodeData, EdgeData>> edges;
+        private TNodeData data;
+        private HashSet<Edge<TNodeData, TEdgeData>> edges;
 
-        public Node(NodeData data)
+        public Node(TNodeData data)
         {
             this.data = data;
-            edges = new HashSet<Edge<NodeData, EdgeData>>();
+            edges = new HashSet<Edge<TNodeData, TEdgeData>>();
         }
 
-        public void AddEdge(Node<NodeData, EdgeData> endNode, EdgeData edgeData)
+        public void AddEdge(Node<TNodeData, TEdgeData> endNode, TEdgeData edgeData)
         {
-            edges.Add(new Edge<NodeData, EdgeData>(this, endNode, edgeData));
+            edges.Add(new Edge<TNodeData, TEdgeData>(this, endNode, edgeData));
         }
 
-        public NodeData GetData() { return data; }
+        public TNodeData GetData() { return data; }
 
-        public HashSet<Edge<NodeData, EdgeData>> GetEdges() { return edges; }
+        public HashSet<Edge<TNodeData, TEdgeData>> GetEdges() { return edges; }
 
-        public bool IsConnected(Node<NodeData, EdgeData> targetNode)
+        public bool IsConnected(Node<TNodeData, TEdgeData> targetNode)
         {
-            foreach (Edge<NodeData, EdgeData> edge in edges)
+            foreach (Edge<TNodeData, TEdgeData> edge in edges)
             {
                 if (edge.GetEndNode() == targetNode)
                 {
@@ -41,7 +41,7 @@ namespace AIWorld.Environment.Environments
             return false;
         }
 
-        public int CompareTo(Node<NodeData, EdgeData> targetNode) { return CompareTo(targetNode); }
+        public int CompareTo(Node<TNodeData, TEdgeData> targetNode) { return CompareTo(targetNode); }
     }
 
     public class Edge<NodeData, EdgeData> : IStateTransition<NodeData, EdgeData>

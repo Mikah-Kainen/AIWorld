@@ -6,23 +6,23 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Agent.BackingStores
 {
-    public class MinHeap<StateData, TransitionData, AgentStateData> : IBackingStore<StateData, TransitionData, AgentStateData>
-        where StateData : IComparable<StateData>
-        where TransitionData : IComparable<TransitionData>
-        where AgentStateData : IComparable<AgentStateData>
+    public class MinHeap<TStateData, TTransitionData, TAgentStateData> : IBackingStore<TStateData, TTransitionData, TAgentStateData>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
+        where TAgentStateData : IComparable<TAgentStateData>
     {
-        private PriorityQueue<AgentState<StateData, TransitionData, AgentStateData>, AgentStateData> backingQueue;
+        private PriorityQueue<AgentState<TStateData, TTransitionData, TAgentStateData>, TAgentStateData> backingQueue;
 
         public MinHeap()
         {
-            backingQueue = new PriorityQueue<AgentState<StateData, TransitionData, AgentStateData>, AgentStateData>();
+            backingQueue = new PriorityQueue<AgentState<TStateData, TTransitionData, TAgentStateData>, TAgentStateData>();
         }
-        public void Add(AgentState<StateData, TransitionData, AgentStateData> state)
+        public void Add(AgentState<TStateData, TTransitionData, TAgentStateData> state)
         {
             backingQueue.Enqueue(state, state.GetAgentStateData());
         }
 
-        public AgentState<StateData, TransitionData, AgentStateData> GetNext()
+        public AgentState<TStateData, TTransitionData, TAgentStateData> GetNext()
         {
             return backingQueue.Dequeue();
         }

@@ -7,26 +7,26 @@ using AIWorld.Environment;
 
 namespace AIWorld.Agent
 {
-    public interface IBackingStore<StateData, TransitionData, AgentStateData>
-        where StateData : IComparable<StateData>
-        where TransitionData : IComparable<TransitionData>
-        where AgentStateData : IComparable<AgentStateData>
+    public interface IBackingStore<TStateData, TTransitionData, TAgentStateData>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
+        where TAgentStateData : IComparable<TAgentStateData>
     {
-        public void Add(AgentState<StateData, TransitionData, AgentStateData> state);
-        public AgentState<StateData, TransitionData, AgentStateData> GetNext(); //Removes and Returns next value from BackingStore
+        public void Add(AgentState<TStateData, TTransitionData, TAgentStateData> state);
+        public AgentState<TStateData, TTransitionData, TAgentStateData> GetNext(); //Removes and Returns next value from BackingStore
     }
 
-    public abstract class Agent<StateData, TransitionData, AgentStateData> : IAgent<StateData, TransitionData>
-        where StateData : IComparable<StateData>
-        where TransitionData : IComparable<TransitionData>
-        where AgentStateData : IComparable<AgentStateData>
+    public abstract class Agent<TStateData, TTransitionData, TAgentStateData> : IAgent<TStateData, TTransitionData>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
+        where TAgentStateData : IComparable<TAgentStateData>
     {
-        protected AgentState<StateData, TransitionData, AgentStateData> currentState;
-        protected Dictionary<IStateMarker<StateData>, AgentStateData> bestSeen; //Cost kept with AgentStateData. Agents try to minimize. Might change in future to remember multiple AgentStateDatas if it becomes hard to directly compare two different AgentStateDatas
-        protected IBackingStore<StateData, TransitionData, AgentStateData> frontier;
-        protected IEnvironment<StateData, TransitionData> environment;
+        protected AgentState<TStateData, TTransitionData, TAgentStateData> currentState;
+        protected Dictionary<IStateMarker<TStateData>, TAgentStateData> bestSeen; //Cost kept with AgentStateData. Agents try to minimize. Might change in future to remember multiple AgentStateDatas if it becomes hard to directly compare two different AgentStateDatas
+        protected IBackingStore<TStateData, TTransitionData, TAgentStateData> frontier;
+        protected IEnvironment<TStateData, TTransitionData> environment;
 
-        private bool ExpandFrontier(AgentState<StateData, TransitionData, AgentStateData> newState)
+        private bool ExpandFrontier(AgentState<TStateData, TTransitionData, TAgentStateData> newState)
         {
             if (bestSeen.ContainsKey(newState.GetState())) //TODO: Change to account for non-certain state transition results
             {
@@ -45,45 +45,30 @@ namespace AIWorld.Agent
             }
             return false;
         }
-        public Agent(IStateMarker<StateData> startingState, IEnvironment<StateData, TransitionData> environment, IBackingStore<StateData, TransitionData, AgentStateData> backingStore)
+        public Agent(IStateMarker<TStateData> startingState, IEnvironment<TStateData, TTransitionData> environment, IBackingStore<TStateData, TTransitionData, TAgentStateData> backingStore)
         {
             this.currentState = GetStartingState(startingState);
-            bestSeen = new Dictionary<IStateMarker<StateData>, AgentStateData>();
+            bestSeen = new Dictionary<IStateMarker<TStateData>, TAgentStateData>();
             this.frontier = backingStore;
             this.environment = environment;
         }
-        public IStateMarker<StateData> GetState() { return currentState.GetState(); }
-        protected AgentState<StateData, TransitionData, AgentStateData> GetAgentState() { return currentState; }
-        public IEnvironment<StateData, TransitionData> GetEnvironment() { return environment; }
+        public IStateMarker<TStateData> GetState() { return currentState.GetState(); }
+        protected AgentState<TStateData, TTransitionData, TAgentStateData> GetAgentState() { return currentState; }
+        public IEnvironment<TStateData, TTransitionData> GetEnvironment() { return environment; }
 
-        public IStateTransition<StateData, TransitionData> Selector(HashSet<IStateTransition<StateData, TransitionData>> choices)
+        public IStateTransition<TStateData, TTransitionData> Selector(HashSet<IStateTransition<TStateData, TTransitionData>> choices)
         {
-            List<AgentState<StateData, TransitionData, AgentStateData>> newAgentStates = new();
-            foreach (IStateTransition<StateData, TransitionData> transition in choices)
+            foreach (IStateTransition<TStateData, TTransitionData> transition in choices)
             {
-                newAgentStates.Add(GenerateState(currentState, transition));
+                AgentState<TStateData, TTransitionData, TAgentStateData> newState = GenerateState(currentState, transition);
+                ExpandFrontier(newState);
             }
 
-            foreach(AgentState<StateData, TransitionData, AgentStateData> newState in newAgentStates)
-            {
-                if (bestSeen.ContainsKey(newState.GetState())) //TODO: Change to account for non-certain state transition results
-                {
-                    if (bestSeen[newState.GetState()].CompareTo(newState.GetAgentStateData()) > 0) //TODO: Add option for maximizing agents; Right now all agents minimize
-                    {
-                        frontier.Add(newState);
-                    }
-                }
-                else
-                {
-                    frontier.Add(newState);
-                }
-            }
             currentState = frontier.GetNext();
-            bestSeen.Add(currentState.GetPreviousState().GetState(), currentState.GetPreviousState().GetAgentStateData());
             return currentState.GetLastMove();
         }
 
-        protected abstract AgentState<StateData, TransitionData, AgentStateData> GenerateState(AgentState<StateData, TransitionData, AgentStateData> previousState, IStateTransition<StateData, TransitionData> transition);
-        protected abstract AgentState<StateData, TransitionData, AgentStateData> GetStartingState(IStateMarker<StateData> startingState);
+        protected abstract AgentState<TStateData, TTransitionData, TAgentStateData> GenerateState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, IStateTransition<TStateData, TTransitionData> transition);
+        protected abstract AgentState<TStateData, TTransitionData, TAgentStateData> GetStartingState(IStateMarker<TStateData> startingState);
     }
 }

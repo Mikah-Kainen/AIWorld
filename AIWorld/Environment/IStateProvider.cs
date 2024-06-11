@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment
 {
-    public interface IStateProvider<TStateMarker, StateData, TStateTransition, TransitionData> : IEnvironment<StateData, TransitionData>
-        where TStateMarker : IStateMarker<StateData>
-        where TStateTransition : IStateTransition<StateData, TransitionData>
+    public interface IStateProvider<TStateMarker, TStateData, TStateTransition, TTransitionData> : IEnvironment<TStateData, TTransitionData>
+        where TStateMarker : IStateMarker<TStateData>
+        where TStateTransition : IStateTransition<TStateData, TTransitionData>
     {
         public HashSet<TStateTransition> GetSuccessors(TStateMarker stateMarker);
-        //HashSet<Func<StateData, bool>> GetTransitionConditions(IAgent agent);
+        //HashSet<Func<TStateData, bool>> GetTransitionConditions(IAgent agent);
     }
 }

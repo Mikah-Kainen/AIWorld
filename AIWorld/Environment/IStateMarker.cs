@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment
 {
-    public interface IStateMarker<StateData>
+    public interface IStateMarker<TStateData>
     {
-        public StateData GetData();
+        public TStateData GetData();
     }
 }

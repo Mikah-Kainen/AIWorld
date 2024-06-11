@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Agent
 {
-    public class AgentState<StateData, TransitionData, AgentStateData>
-        where StateData : IComparable<StateData>
-        where TransitionData : IComparable<TransitionData>
-        where AgentStateData : IComparable<AgentStateData>
+    public class AgentState<TStateData, TTransitionData, TAgentStateData>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
+        where TAgentStateData : IComparable<TAgentStateData>
     {
-        private AgentState<StateData, TransitionData, AgentStateData> previousState;
-        private AgentStateData agentStateData;
-        private IStateTransition<StateData, TransitionData> lastMove;
-        private IStateMarker<StateData> state;
-        public AgentState(AgentState<StateData, TransitionData, AgentStateData> previousState, AgentStateData agentStateData, IStateTransition<StateData, TransitionData> lastMove) 
+        private AgentState<TStateData, TTransitionData, TAgentStateData> previousState;
+        private TAgentStateData agentStateData;
+        private IStateTransition<TStateData, TTransitionData> lastMove;
+        private IStateMarker<TStateData> state;
+        public AgentState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, TAgentStateData agentStateData, IStateTransition<TStateData, TTransitionData> lastMove) 
         {
             this.previousState = previousState;
             this.agentStateData = agentStateData;
@@ -25,9 +25,9 @@ namespace AIWorld.Agent
             this.state = lastMove.GetEndState(); //TODO: Add uncertainty to the game. Agents' states can only be known in uncertain games after a transition is picked and the result is returned from the environment
         }
 
-        public AgentState<StateData, TransitionData, AgentStateData> GetPreviousState() { return previousState; }
-        public AgentStateData GetAgentStateData() { return agentStateData; }
-        public IStateTransition<StateData, TransitionData> GetLastMove() {  return lastMove; }
-        public IStateMarker<StateData> GetState() { return state; }
+        public AgentState<TStateData, TTransitionData, TAgentStateData> GetPreviousState() { return previousState; }
+        public TAgentStateData GetAgentStateData() { return agentStateData; }
+        public IStateTransition<TStateData, TTransitionData> GetLastMove() {  return lastMove; }
+        public IStateMarker<TStateData> GetState() { return state; }
     }
 }
