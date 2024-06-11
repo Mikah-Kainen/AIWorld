@@ -21,7 +21,7 @@ namespace AIWorld.Agent.Agents
 
     //    public override IStateTransition<int, int> Selector(HashSet<IStateTransition<int, int>> choices)
     //    {
-    //        List<AgentState<int, int>> 
+    //        List < AgentState<int, int> >
     //        foreach (IStateTransition<int, int> transition in choices)
     //        {
     //            IStateMarker<int> endState = transition.GetEndState();

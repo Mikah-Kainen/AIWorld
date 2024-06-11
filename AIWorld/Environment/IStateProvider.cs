@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment
 {
-    public interface IStateProvider<TStateMarker, StateData, TStateTransition, TransitionData> : IStateProviderBasic<StateData, TransitionData>
+    public interface IStateProvider<TStateMarker, StateData, TStateTransition, TransitionData> : IEnvironment<StateData, TransitionData>
         where TStateMarker : IStateMarker<StateData>
         where TStateTransition : IStateTransition<StateData, TransitionData>
     {

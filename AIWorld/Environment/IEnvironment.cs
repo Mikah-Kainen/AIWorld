@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment
 {
-    public interface IStateProviderBasic<StateData, TransitionData>
+    public interface IEnvironment<StateData, TransitionData>
     {
         public HashSet<IStateTransition<StateData, TransitionData>> GetSuccessors(IStateMarker<StateData> stateMarker);
+        
+        //TODO: Add a function that returns the state resulting from a transition for problems with uncertain transitions
     }
 }
