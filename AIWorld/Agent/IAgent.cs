@@ -7,12 +7,16 @@ using AIWorld.Environment;
 
 namespace AIWorld.Agent
 {
-    public interface IAgent<TStateData, TTransitionData>
-        where TStateData : IComparable<TStateData>
-        where TTransitionData : IComparable<TTransitionData>
+    public interface IAgent<TStateData, TTransitionData> : IDisplayable
     {
         IStateMarker<TStateData> GetState();
-        IEnvironment<TStateData, TTransitionData> GetEnvironment();
-        IStateTransition<TStateData, TTransitionData> Selector(HashSet<IStateTransition<TStateData, TTransitionData>> choices);
+        /// <summary>
+        /// Selects and moves the agent to the next-best spot among currently know or newly provided(choices) spots
+        /// </summary>
+        /// <param name="choices"></param>
+        /// <returns></returns>
+        IStateTransition<TStateData, TTransitionData> SelectMove(HashSet<IStateTransition<TStateData, TTransitionData>> choices);
+
+        List<IStateMarker<TStateData>> GetCurrentPath();
     }
 }

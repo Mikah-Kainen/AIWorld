@@ -10,26 +10,21 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Agent.Agents
 {
-    //public class BreathFirstAgent : Agent<int, int, int>
-    //{
-    //    private int currentLayer;
-    //    public BreathFirstAgent(IStateMarker<int> startingState, IStateProviderBasic<int, int> environment)
-    //        : base(startingState, environment, new MinHeap<int, int>())
-    //    {
-    //        currentLayer = 0;
-    //    }
+    public class BreathFirstAgent<TStateData, TTransitionData> : Agent<TStateData, TTransitionData, int>
+        where TStateData : IComparable<TStateData>
+        where TTransitionData : IComparable<TTransitionData>
+    {
+        public BreathFirstAgent(IStateMarker<TStateData> startingState)
+            : base("Breath First Agent", startingState, new MinHeap<TStateData, TTransitionData, int>()) {}
 
-    //    public override IStateTransition<int, int> Selector(HashSet<IStateTransition<int, int>> choices)
-    //    {
-    //        List < AgentState<int, int> >
-    //        foreach (IStateTransition<int, int> transition in choices)
-    //        {
-    //            IStateMarker<int> endState = transition.GetEndState();
-    //            if (!closedSet.ContainsKey(endState))
-    //            {
-    //                frontier.Add(transition, currentLayer);
-    //            }
-    //        }
-    //    }
-    //}
+        protected override AgentState<TStateData, TTransitionData, int> GenerateState(AgentState<TStateData, TTransitionData, int> previousState, IStateTransition<TStateData, TTransitionData> transition)
+        {
+            return new AgentState<TStateData, TTransitionData, int>(previousState, previousState.GetAgentStateData() + 1, transition, transition.GetEndState());
+        }
+
+        protected override int GetStartingStateData(IStateMarker<TStateData> startingState)
+        {
+            return 0;
+        }
+    }
 }
