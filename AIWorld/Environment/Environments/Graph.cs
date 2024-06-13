@@ -170,10 +170,24 @@ namespace AIWorld.Environment.Environments
             return newEdge;
         }
 
-        public HashSet<IStateTransition<TNodeData, TEdgeData>> GetSuccessors(IStateMarker<TNodeData> stateMarker)
+        //public HashSet<IStateTransition<TNodeData, TEdgeData>> GetSuccessors(IStateMarker<TNodeData> stateMarker)
+        //{
+        //    Node<TNodeData, TEdgeData> currentNode = (Node<TNodeData, TEdgeData>)stateMarker;
+        //    HashSet<IStateTransition<TNodeData, TEdgeData>> returnSet = new HashSet<IStateTransition<TNodeData, TEdgeData>>();
+        //    if (nodes.Contains(currentNode))
+        //    {
+        //        foreach (Edge<TNodeData, TEdgeData> edge in currentNode.GetEdges())
+        //        {
+        //            returnSet.Add(edge);
+        //        }
+        //    }
+        //    return returnSet;
+        //}
+
+        public override HashSet<Edge<TNodeData, TEdgeData>> GetSuccessors(Node<TNodeData, TEdgeData> stateMarker)
         {
             Node<TNodeData, TEdgeData> currentNode = (Node<TNodeData, TEdgeData>)stateMarker;
-            HashSet<IStateTransition<TNodeData, TEdgeData>> returnSet = new HashSet<IStateTransition<TNodeData, TEdgeData>>();
+            HashSet<Edge<TNodeData, TEdgeData>> returnSet = new HashSet<Edge<TNodeData, TEdgeData>>();
             if (nodes.Contains(currentNode))
             {
                 foreach (Edge<TNodeData, TEdgeData> edge in currentNode.GetEdges())
@@ -182,15 +196,6 @@ namespace AIWorld.Environment.Environments
                 }
             }
             return returnSet;
-        }
-
-        public HashSet<Edge<TNodeData, TEdgeData>> GetSuccessors(Node<TNodeData, TEdgeData> stateMarker)
-        {
-            if (nodes.Contains(stateMarker))
-            {
-                return stateMarker.GetEdges();
-            }
-            return new HashSet<Edge<TNodeData, TEdgeData>>();
         }
 
 

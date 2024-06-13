@@ -14,7 +14,9 @@ namespace AIWorld.Agent
         public AgentState<TStateData, TTransitionData, TAgentStateData> GetNext(); //Removes and Returns next value from BackingStore
     }
 
-    public abstract class Agent<TStateData, TTransitionData, TAgentStateData> : IAgent<TStateData, TTransitionData>
+    public abstract class Agent<TStateMarker, TStateData, TStateTransition, TTransitionData, TAgentStateData> : IAgent<TStateData, TTransitionData>
+        where TStateMarker : IStateMarker<TStateData>
+        where TStateTransition : IStateTransition<TStateData, TTransitionData>
         where TAgentStateData : IComparable<TAgentStateData>
     {
         public String Name;
@@ -48,7 +50,7 @@ namespace AIWorld.Agent
             bestSeen = new Dictionary<IStateMarker<TStateData>, TAgentStateData>();
             this.frontier = backingStore;
         }
-        public IStateMarker<TStateData> GetState() { return currentState.GetState(); }
+        public TStateMarker GetState() { return currentState.GetState(); }
         protected AgentState<TStateData, TTransitionData, TAgentStateData> GetAgentState() { return currentState; }
         public IStateTransition<TStateData, TTransitionData> SelectMove(HashSet<IStateTransition<TStateData, TTransitionData>> choices)
         {
@@ -65,9 +67,20 @@ namespace AIWorld.Agent
         protected abstract AgentState<TStateData, TTransitionData, TAgentStateData> GenerateState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, IStateTransition<TStateData, TTransitionData> transition);
         protected abstract TAgentStateData GetStartingStateData(IStateMarker<TStateData> startingState);
 
-        protected virtual void Display(TStateData stateData) { Console.Write(stateData.ToString()); }
-        protected virtual void Display(TTransitionData transitionData) { Console.Write(transitionData.ToString()); }
-        protected virtual void Display(TAgentStateData agentStateData) { Console.Write(agentStateData.ToString()); }
+        private const int minDisplayLength = 3;
+        protected virtual void Display(TStateData stateData) { SpacedDisplay(stateData.ToString(), minDisplayLength); }
+        protected virtual void Display(TTransitionData transitionData) { SpacedDisplay(transitionData.ToString(), minDisplayLength); }
+        protected virtual void Display(TAgentStateData agentStateData) { SpacedDisplay(agentStateData.ToString(), minDisplayLength); }
+        private void SpacedDisplay(String message, int minLength)
+        {
+            int extra = minLength - message.Length;
+            for (int i = 0; i < extra; i++)
+            {
+                Console.Write(" ");
+            }
+            Console.Write(message);
+        }
+
         public void Display()
         {
             Console.WriteLine($"{Name}: ");

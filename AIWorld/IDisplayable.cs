@@ -9,6 +9,6 @@ namespace AIWorld
 {
     public interface IDisplayable
     {
-        void Display();
+        public void Display();
     }
 }
