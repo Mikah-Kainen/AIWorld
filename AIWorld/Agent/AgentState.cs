@@ -1,4 +1,5 @@
 ﻿using AIWorld.Environment;
+using AIWorld.Agent.EnvironmentTokens;
 
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ namespace AIWorld.Agent
     {
         private AgentState<TStateData, TTransitionData, TAgentStateData> previousState;
         private TAgentStateData agentStateData;
-        private IStateTransition<TStateData, TTransitionData> lastMove;
-        private IStateMarker<TStateData> currentState;
-        public AgentState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, TAgentStateData agentStateData, IStateTransition<TStateData, TTransitionData> lastMove, IStateMarker<TStateData> currentState) 
+        private TransitionToken<TStateData, TTransitionData> lastMove;
+        private StateToken<TStateData> currentState;
+        public AgentState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, TAgentStateData agentStateData, TransitionToken<TStateData, TTransitionData> lastMove, StateToken<TStateData> currentState) 
         {
             this.previousState = previousState;
             this.agentStateData = agentStateData;
@@ -23,12 +24,12 @@ namespace AIWorld.Agent
             this.currentState = currentState;
         }
 
-        public AgentState(TAgentStateData agentStateData, IStateMarker<TStateData> currentState) : this(null, agentStateData, null, currentState) { }
+        public AgentState(TAgentStateData agentStateData, StateToken<TStateData> currentState) : this(null, agentStateData, null, currentState) { }
 
         public AgentState<TStateData, TTransitionData, TAgentStateData> GetPreviousState() { return previousState; }
         public TAgentStateData GetAgentStateData() { return agentStateData; }
-        public IStateTransition<TStateData, TTransitionData> GetLastMove() {  return lastMove; }
-        public IStateMarker<TStateData> GetState() { return currentState; }
+        public TransitionToken<TStateData, TTransitionData> GetLastMove() {  return lastMove; }
+        public StateToken<TStateData> GetState() { return currentState; }
 
         public List<AgentState<TStateData, TTransitionData, TAgentStateData>> GetPath()
         {

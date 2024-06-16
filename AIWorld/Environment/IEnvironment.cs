@@ -10,9 +10,9 @@ namespace AIWorld.Environment
 {
     public interface IEnvironment<TStateData, TTransitionData>
     {
-        public HashSet<IStateTransition<TStateData, TTransitionData>> GetSuccessors(IStateMarker<TStateData> stateMarker);
+        public HashSet<ITransition<TStateData, TTransitionData>> GetSuccessors(IState<TStateData> stateMarker);
 
-        public List<List<IStateMarker<TStateData>>> FindPaths(List<IAgent<TStateData, TTransitionData>> agents, IStateMarker<TStateData> targetState);
+        public List<List<IState<TStateData>>> FindPaths(List<IAgent<TStateData, TTransitionData>> agents, IState<TStateData> targetState);
         //TODO: Add a function that returns the state resulting from a transition for problems with uncertain transitions
     }
 }

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using AIWorld.Agent.EnvironmentTokens;
 using AIWorld.Environment;
 
 namespace AIWorld.Agent
@@ -14,14 +16,12 @@ namespace AIWorld.Agent
         public AgentState<TStateData, TTransitionData, TAgentStateData> GetNext(); //Removes and Returns next value from BackingStore
     }
 
-    public abstract class Agent<TStateMarker, TStateData, TStateTransition, TTransitionData, TAgentStateData> : IAgent<TStateData, TTransitionData>
-        where TStateMarker : IStateMarker<TStateData>
-        where TStateTransition : IStateTransition<TStateData, TTransitionData>
+    public abstract class Agent<TStateData, TTransitionData, TAgentStateData> : IAgent<TStateData, TTransitionData>
         where TAgentStateData : IComparable<TAgentStateData>
     {
         public String Name;
         protected AgentState<TStateData, TTransitionData, TAgentStateData> currentState;
-        protected Dictionary<IStateMarker<TStateData>, TAgentStateData> bestSeen; //Cost kept with AgentStateData. Agents try to minimize. Might change in future to remember multiple AgentStateDatas if it becomes hard to directly compare two different AgentStateDatas
+        protected Dictionary<StateToken<TStateData>, TAgentStateData> bestSeen; //Cost kept with AgentStateData. Agents try to minimize. Might change in future to remember multiple AgentStateDatas if it becomes hard to directly compare two different AgentStateDatas
         protected IBackingStore<TStateData, TTransitionData, TAgentStateData> frontier;
 
         private bool ExpandFrontier(AgentState<TStateData, TTransitionData, TAgentStateData> newState)
@@ -43,18 +43,18 @@ namespace AIWorld.Agent
             }
             return false;
         }
-        public Agent(String name, IStateMarker<TStateData> startingState, IBackingStore<TStateData, TTransitionData, TAgentStateData> backingStore)
+        public Agent(String name, StateToken<TStateData> startingState, IBackingStore<TStateData, TTransitionData, TAgentStateData> backingStore)
         {
             this.Name = name;
             this.currentState = new AgentState<TStateData, TTransitionData, TAgentStateData>(GetStartingStateData(startingState), startingState);
-            bestSeen = new Dictionary<IStateMarker<TStateData>, TAgentStateData>();
+            bestSeen = new Dictionary<StateToken<TStateData>, TAgentStateData>();
             this.frontier = backingStore;
         }
-        public TStateMarker GetState() { return currentState.GetState(); }
+        public StateToken<TStateData> GetState() { return currentState.GetState(); }
         protected AgentState<TStateData, TTransitionData, TAgentStateData> GetAgentState() { return currentState; }
-        public IStateTransition<TStateData, TTransitionData> SelectMove(HashSet<IStateTransition<TStateData, TTransitionData>> choices)
+        public TransitionToken<TStateData, TTransitionData> SelectMove(HashSet<TransitionToken<TStateData, TTransitionData>> choices)
         {
-            foreach (IStateTransition<TStateData, TTransitionData> transition in choices)
+            foreach (TransitionToken<TStateData, TTransitionData> transition in choices)
             {
                 AgentState<TStateData, TTransitionData, TAgentStateData> newState = GenerateState(currentState, transition);
                 ExpandFrontier(newState);
@@ -64,8 +64,8 @@ namespace AIWorld.Agent
             return currentState.GetLastMove();
         }
 
-        protected abstract AgentState<TStateData, TTransitionData, TAgentStateData> GenerateState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, IStateTransition<TStateData, TTransitionData> transition);
-        protected abstract TAgentStateData GetStartingStateData(IStateMarker<TStateData> startingState);
+        protected abstract AgentState<TStateData, TTransitionData, TAgentStateData> GenerateState(AgentState<TStateData, TTransitionData, TAgentStateData> previousState, TransitionToken<TStateData, TTransitionData> transition);
+        protected abstract TAgentStateData GetStartingStateData(StateToken<TStateData> startingState);
 
         private const int minDisplayLength = 3;
         protected virtual void Display(TStateData stateData) { SpacedDisplay(stateData.ToString(), minDisplayLength); }
@@ -114,10 +114,10 @@ namespace AIWorld.Agent
 
         }
 
-        public List<IStateMarker<TStateData>> GetCurrentPath()
+        public List<StateToken<TStateData>> GetCurrentPath()
         {
             List<AgentState<TStateData, TTransitionData, TAgentStateData>> path = currentState.GetPath();
-            List<IStateMarker<TStateData>> returnList = new();
+            List<StateToken<TStateData>> returnList = new();
             foreach(var state in path)
             {
                 returnList.Add(state.GetState());

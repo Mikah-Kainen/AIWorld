@@ -1,4 +1,5 @@
 ﻿using AIWorld.Agent;
+using AIWorld.Agent.EnvironmentTokens;
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment.Environments
 {
-    public class Node<TNodeData, TEdgeData> : IStateMarker<TNodeData>
+    public class Node<TNodeData, TEdgeData> : IState<TNodeData>
     {
         private TNodeData data;
         private HashSet<Edge<TNodeData, TEdgeData>> edges;
@@ -53,7 +54,7 @@ namespace AIWorld.Environment.Environments
         }
     }
 
-    public class Edge<TNodeData, TEdgeData> : IStateTransition<TNodeData, TEdgeData>
+    public class Edge<TNodeData, TEdgeData> : ITransition<TNodeData, TEdgeData>
     {
         private Node<TNodeData, TEdgeData> startNode;
         private Node<TNodeData, TEdgeData> endNode;
@@ -65,14 +66,14 @@ namespace AIWorld.Environment.Environments
             endNode = edgeEndNode;
             data = edgeData;
         }
-        public IStateMarker<TNodeData> GetStartState() { return startNode; }
-        public IStateMarker<TNodeData> GetEndState() { return endNode; }
+        public IState<TNodeData> GetStartState() { return startNode; }
+        public IState<TNodeData> GetEndState() { return endNode; }
         public Node<TNodeData, TEdgeData> GetStartNode() { return startNode; }
         public Node<TNodeData, TEdgeData> GetEndNode() { return endNode; }
         public TEdgeData GetData() { return data; }
     }
 
-    public class Graph<TNodeData, TEdgeData> : IStateProvider<Node<TNodeData, TEdgeData>, TNodeData, Edge<TNodeData, TEdgeData>, TEdgeData>
+    public class Graph<TNodeData, TEdgeData> : StateProvider<Node<TNodeData, TEdgeData>, TNodeData, Edge<TNodeData, TEdgeData>, TEdgeData>
     {
         private HashSet<Node<TNodeData, TEdgeData>> nodes;
         private HashSet<Edge<TNodeData, TEdgeData>> edges;
@@ -184,24 +185,24 @@ namespace AIWorld.Environment.Environments
         //    return returnSet;
         //}
 
-        public override HashSet<Edge<TNodeData, TEdgeData>> GetSuccessors(Node<TNodeData, TEdgeData> stateMarker)
+        public override HashSet<TransitionToken<TNodeData, TEdgeData>> GetSuccessors(StateToken<TNodeData> stateMarker)
         {
-            Node<TNodeData, TEdgeData> currentNode = (Node<TNodeData, TEdgeData>)stateMarker;
-            HashSet<Edge<TNodeData, TEdgeData>> returnSet = new HashSet<Edge<TNodeData, TEdgeData>>();
+            Node<TNodeData, TEdgeData> currentNode = RedeemToken(stateMarker);
+            HashSet<TransitionToken<TNodeData, TEdgeData>> returnSet = new HashSet<TransitionToken<TNodeData, TEdgeData>>();
             if (nodes.Contains(currentNode))
             {
                 foreach (Edge<TNodeData, TEdgeData> edge in currentNode.GetEdges())
                 {
-                    returnSet.Add(edge);
+                    returnSet.Add(GenerateToken(edge));
                 }
             }
             return returnSet;
         }
 
 
-        public List<List<IStateMarker<TNodeData>>> FindPaths(List<IAgent<TNodeData, TEdgeData>> agents, IStateMarker<TNodeData> targetState)
+        public List<List<StateToken<TNodeData>>> FindPaths(List<IAgent<TNodeData, TEdgeData>> agents, IState<TNodeData> targetState)
         {
-            List<List<IStateMarker<TNodeData>>> returnLists = new();
+            List<List<StateToken<TNodeData>>> returnLists = new();
             for (int i = 0; i < agents.Count; i ++)
             {
                 returnLists.Add(null);
@@ -220,7 +221,7 @@ namespace AIWorld.Environment.Environments
                     agents[i].Display();
                     Console.Write("\n");
                     if (agents[i].GetState() != targetState) {
-                        var successors = GetSuccessors(agents[i].GetState());
+                        HashSet<TransitionToken<TNodeData, TEdgeData>> successors = GetSuccessors(agents[i].GetState());
                         agents[i].SelectMove(successors);
                     }
                     else if (agentsComplete[i] != true)

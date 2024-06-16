@@ -1,4 +1,5 @@
 ﻿using AIWorld.Agent.BackingStores;
+using AIWorld.Agent.EnvironmentTokens;
 using AIWorld.Environment;
 using AIWorld.Environment.Environments;
 
@@ -14,15 +15,15 @@ namespace AIWorld.Agent.Agents
         where TStateData : IComparable<TStateData>
         where TTransitionData : IComparable<TTransitionData>
     {
-        public BreathFirstAgent(IStateMarker<TStateData> startingState)
+        public BreathFirstAgent(StateToken<TStateData> startingState)
             : base("Breath First Agent", startingState, new MinHeap<TStateData, TTransitionData, int>()) {}
 
-        protected override AgentState<TStateData, TTransitionData, int> GenerateState(AgentState<TStateData, TTransitionData, int> previousState, IStateTransition<TStateData, TTransitionData> transition)
+        protected override AgentState<TStateData, TTransitionData, int> GenerateState(AgentState<TStateData, TTransitionData, int> previousState, TransitionToken<TStateData, TTransitionData> transition)
         {
             return new AgentState<TStateData, TTransitionData, int>(previousState, previousState.GetAgentStateData() + 1, transition, transition.GetEndState());
         }
 
-        protected override int GetStartingStateData(IStateMarker<TStateData> startingState)
+        protected override int GetStartingStateData(StateToken<TStateData> startingState)
         {
             return 0;
         }
