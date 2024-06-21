@@ -8,6 +8,6 @@ namespace AIWorld.Environment
 {
     public interface IState<TStateData>
     {
-        public TStateData GetData();
+        TStateData GetData();
     }
 }

@@ -11,6 +11,7 @@ namespace AIWorld.Agent
 {
     public interface IAgent<TStateData, TTransitionData> : IDisplayable
     {
+        void SetStartState(StateToken<TStateData> startingState);
         StateToken<TStateData> GetState();
 
         /// <summary>

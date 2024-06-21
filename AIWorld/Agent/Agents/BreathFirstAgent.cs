@@ -15,8 +15,8 @@ namespace AIWorld.Agent.Agents
         where TStateData : IComparable<TStateData>
         where TTransitionData : IComparable<TTransitionData>
     {
-        public BreathFirstAgent(StateToken<TStateData> startingState)
-            : base("Breath First Agent", startingState, new MinHeap<TStateData, TTransitionData, int>()) {}
+        public BreathFirstAgent()
+            : base("Breath First Agent", new MinHeap<TStateData, TTransitionData, int>()) {}
 
         protected override AgentState<TStateData, TTransitionData, int> GenerateState(AgentState<TStateData, TTransitionData, int> previousState, TransitionToken<TStateData, TTransitionData> transition)
         {

@@ -15,19 +15,21 @@ namespace AIWorld
             var n5_1 = graph.AddNode(5);
             var n10_1 = graph.AddNode(10);
 
-            graph.AddEdge(n3_1, n3_2, 1);
-            graph.AddEdge(n3_2, n5_1, 3);
-            graph.AddEdge(n5_1, n10_1, 2);
+            graph.AddEdge(1, n3_1, n3_2);
+            graph.AddEdge(2, n3_2, n5_1);
+            graph.AddEdge(3, n5_1, n10_1);
 
-            graph.AddEdge(n3_1, n4_1, 5);
-            graph.AddEdge(n4_1, n10_1, 8);
+            graph.AddEdge(12, n3_1, n4_1);
+            graph.AddEdge(13, n4_1, n10_1);
 
-            graph.AddEdge(5, 10, 3);
+            graph.AddEdge(100, 10, 3);
 
             List<IAgent<int, int>> agents = new();
-            agents.Add(new BreathFirstAgent<int, int>(n3_1));
-            agents.Add(new BreathFirstAgent<int, int>(n5_1));
-            graph.FindPaths(agents, n10_1);
+            agents.Add(new BreathFirstAgent<int, int>());
+            agents.Add(new BreathFirstAgent<int, int>());
+            graph.PlaceAgents(agents, n3_1);
+            graph.FindPaths(10);
+            //graph.FindPaths(agents, n10_1);
         }
     }
 }

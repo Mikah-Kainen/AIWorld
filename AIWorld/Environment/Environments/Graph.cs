@@ -13,21 +13,21 @@ namespace AIWorld.Environment.Environments
     public class Node<TNodeData, TEdgeData> : IState<TNodeData>
     {
         private TNodeData data;
-        private HashSet<Edge<TNodeData, TEdgeData>> edges;
+        private HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> edges;
 
         public Node(TNodeData data)
         {
             this.data = data;
-            edges = new HashSet<Edge<TNodeData, TEdgeData>>();
+            edges = new HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>>();
         }
 
-        public Edge<TNodeData, TEdgeData> AddEdge(Node<TNodeData, TEdgeData> endNode, TEdgeData edgeData)
+        public Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> AddEdge(TEdgeData edgeData, Node<TNodeData, TEdgeData> endNode)
         {
-            Edge<TNodeData, TEdgeData> newEdge = new Edge<TNodeData, TEdgeData>(this, endNode, edgeData);
+            Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> newEdge = new Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>(edgeData, this, endNode);
             edges.Add(newEdge);
             return newEdge;
         }
-        public Edge<TNodeData, TEdgeData> AddEdge(Edge<TNodeData, TEdgeData> edge)
+        public Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> AddEdge(Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> edge)
         {
             if (edge.GetStartNode() != this)
             {
@@ -39,11 +39,11 @@ namespace AIWorld.Environment.Environments
 
         public TNodeData GetData() { return data; }
 
-        public HashSet<Edge<TNodeData, TEdgeData>> GetEdges() { return edges; }
+        public HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> GetEdges() { return edges; }
 
         public bool IsConnected(Node<TNodeData, TEdgeData> targetNode)
         {
-            foreach (Edge<TNodeData, TEdgeData> edge in edges)
+            foreach (Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> edge in edges)
             {
                 if (edge.GetEndNode() == targetNode)
                 {
@@ -54,39 +54,41 @@ namespace AIWorld.Environment.Environments
         }
     }
 
-    public class Edge<TNodeData, TEdgeData> : ITransition<TNodeData, TEdgeData>
+    public class Edge<TNode, TNodeData, TEdgeData> : ITransition<TNode, TNodeData, TEdgeData>
+        where TNode : IState<TNodeData>
     {
-        private Node<TNodeData, TEdgeData> startNode;
-        private Node<TNodeData, TEdgeData> endNode;
         private TEdgeData data;
+        private TNode startNode;
+        private TNode endNode;
 
-        public Edge(Node<TNodeData, TEdgeData> edgeStartNode, Node<TNodeData, TEdgeData> edgeEndNode, TEdgeData edgeData)
+        public Edge(TEdgeData edgeData, TNode edgeStartNode, TNode edgeEndNode)
         {
+            data = edgeData;
             startNode = edgeStartNode;
             endNode = edgeEndNode;
-            data = edgeData;
         }
-        public IState<TNodeData> GetStartState() { return startNode; }
-        public IState<TNodeData> GetEndState() { return endNode; }
-        public Node<TNodeData, TEdgeData> GetStartNode() { return startNode; }
-        public Node<TNodeData, TEdgeData> GetEndNode() { return endNode; }
         public TEdgeData GetData() { return data; }
+        public TNode GetStartState() { return startNode; }
+        public TNode GetEndState() { return endNode; }
+
+        public TNode GetStartNode() => GetStartState();
+        public TNode GetEndNode() => GetEndState();
     }
 
-    public class Graph<TNodeData, TEdgeData> : StateProvider<Node<TNodeData, TEdgeData>, TNodeData, Edge<TNodeData, TEdgeData>, TEdgeData>
+    public class Graph<TNodeData, TEdgeData> : Environment<Node<TNodeData, TEdgeData>, TNodeData, Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>, TEdgeData>
     {
         private HashSet<Node<TNodeData, TEdgeData>> nodes;
-        private HashSet<Edge<TNodeData, TEdgeData>> edges;
+        private HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> edges;
 
         public Graph()
         {
             nodes = new HashSet<Node<TNodeData, TEdgeData>>();
-            edges = new HashSet<Edge<TNodeData, TEdgeData>>();
+            edges = new HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>>();
         }
 
         public int GetCount() { return nodes.Count; }
         public HashSet<Node<TNodeData, TEdgeData>> GetNodes() { return nodes; }
-        public HashSet<Edge<TNodeData, TEdgeData>> GetEdges() { return edges; }
+        public HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> GetEdges() { return edges; }
         public bool Contains(Node<TNodeData, TEdgeData> node) { return nodes.Contains(node); }
         public HashSet<Node<TNodeData, TEdgeData>> GetNodes(TNodeData nodeData)
         {
@@ -101,9 +103,9 @@ namespace AIWorld.Environment.Environments
             return returnSet;
         }
         public int Contains(TNodeData nodeData) { return GetNodes(nodeData).Count; }
-        public HashSet<Edge<TNodeData, TEdgeData>> GetEdges(TNodeData startNodeData, TNodeData endNodeData)
+        public HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> GetEdges(TNodeData startNodeData, TNodeData endNodeData)
         {
-            HashSet<Edge<TNodeData, TEdgeData>> returnEdges = new HashSet<Edge<TNodeData, TEdgeData>>();
+            HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> returnEdges = new HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>>();
             HashSet<Node<TNodeData, TEdgeData>> startNodes = GetNodes(startNodeData);
             if (startNodes.Count == 0)
             {
@@ -112,7 +114,7 @@ namespace AIWorld.Environment.Environments
 
             foreach (Node<TNodeData, TEdgeData> node in startNodes)
             {
-                foreach (Edge<TNodeData, TEdgeData> edge in node.GetEdges())
+                foreach (Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> edge in node.GetEdges())
                 {
                     if (edge.GetEndNode().GetData().Equals(endNodeData))
                     {
@@ -138,7 +140,7 @@ namespace AIWorld.Environment.Environments
         /// <param name="edgeData"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public Edge<TNodeData, TEdgeData> AddEdge(Node<TNodeData, TEdgeData> startNode, Node<TNodeData, TEdgeData> endNode, TEdgeData edgeData)
+        public Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> AddEdge(TEdgeData edgeData, Node<TNodeData, TEdgeData> startNode, Node<TNodeData, TEdgeData> endNode)
         {
             if (!Contains(startNode))
             {
@@ -148,7 +150,7 @@ namespace AIWorld.Environment.Environments
             {
                 throw new Exception("EndNode not in Graph");
             }
-            Edge<TNodeData, TEdgeData> newEdge = new Edge<TNodeData, TEdgeData>(startNode, endNode, edgeData);
+            Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> newEdge = new Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>(edgeData, startNode, endNode);
             edges.Add(newEdge);
             startNode.AddEdge(newEdge);
             return newEdge;
@@ -161,11 +163,11 @@ namespace AIWorld.Environment.Environments
         /// <param name="endNodeData"></param>
         /// <param name="edgeData"></param>
         /// <returns></returns>
-        public Edge<TNodeData, TEdgeData> AddEdge(TNodeData startNodeData, TNodeData endNodeData, TEdgeData edgeData)
+        public Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> AddEdge(TEdgeData edgeData, TNodeData startNodeData, TNodeData endNodeData)
         {
             Node<TNodeData, TEdgeData> startNode = AddNode(startNodeData);
             Node<TNodeData, TEdgeData> endNode = AddNode(endNodeData);
-            Edge<TNodeData, TEdgeData> newEdge = new Edge<TNodeData, TEdgeData>(startNode, endNode, edgeData);
+            Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> newEdge = new Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>(edgeData, startNode, endNode);
             edges.Add(newEdge);
             startNode.AddEdge(newEdge);
             return newEdge;
@@ -177,7 +179,7 @@ namespace AIWorld.Environment.Environments
         //    HashSet<IStateTransition<TNodeData, TEdgeData>> returnSet = new HashSet<IStateTransition<TNodeData, TEdgeData>>();
         //    if (nodes.Contains(currentNode))
         //    {
-        //        foreach (Edge<TNodeData, TEdgeData> edge in currentNode.GetEdges())
+        //        foreach (Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> edge in currentNode.GetEdges())
         //        {
         //            returnSet.Add(edge);
         //        }
@@ -191,60 +193,12 @@ namespace AIWorld.Environment.Environments
             HashSet<TransitionToken<TNodeData, TEdgeData>> returnSet = new HashSet<TransitionToken<TNodeData, TEdgeData>>();
             if (nodes.Contains(currentNode))
             {
-                foreach (Edge<TNodeData, TEdgeData> edge in currentNode.GetEdges())
+                foreach (Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData> edge in currentNode.GetEdges())
                 {
                     returnSet.Add(GenerateToken(edge));
                 }
             }
             return returnSet;
-        }
-
-
-        public List<List<StateToken<TNodeData>>> FindPaths(List<IAgent<TNodeData, TEdgeData>> agents, IState<TNodeData> targetState)
-        {
-            List<List<StateToken<TNodeData>>> returnLists = new();
-            for (int i = 0; i < agents.Count; i ++)
-            {
-                returnLists.Add(null);
-            }
-            bool[] agentsComplete = new bool[agents.Count];
-            bool finished = false;
-            while (!finished)
-            {
-                Console.Clear();
-                for(int i = 0; i < agents.Count; i ++)
-                {
-                    if (agentsComplete[i])
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green;
-                    }
-                    agents[i].Display();
-                    Console.Write("\n");
-                    if (agents[i].GetState() != targetState) {
-                        HashSet<TransitionToken<TNodeData, TEdgeData>> successors = GetSuccessors(agents[i].GetState());
-                        agents[i].SelectMove(successors);
-                    }
-                    else if (agentsComplete[i] != true)
-                    {
-                        agentsComplete[i] = true;
-                        returnLists[i] = agents[i].GetCurrentPath();
-                    }
-                    Console.Write("\n\n");
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                Console.ReadLine();
-
-                finished = true;
-                for (int i = 0; i < agentsComplete.Length; i ++)
-                {
-                    if (agentsComplete[i] == false)
-                    {
-                        finished = false;
-                        break;
-                    }
-                }
-            }
-            return returnLists;
         }
     }
 }

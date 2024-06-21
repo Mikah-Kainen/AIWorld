@@ -12,6 +12,7 @@ namespace AIWorld.Agent
     public interface IBackingStore<TStateData, TTransitionData, TAgentStateData>
         where TAgentStateData : IComparable<TAgentStateData>
     {
+        public HashSet<AgentState<TStateData, TTransitionData, TAgentStateData>> GetFrontierStates(); //Debug Set
         public void Add(AgentState<TStateData, TTransitionData, TAgentStateData> state);
         public AgentState<TStateData, TTransitionData, TAgentStateData> GetNext(); //Removes and Returns next value from BackingStore
     }
@@ -24,6 +25,18 @@ namespace AIWorld.Agent
         protected Dictionary<StateToken<TStateData>, TAgentStateData> bestSeen; //Cost kept with AgentStateData. Agents try to minimize. Might change in future to remember multiple AgentStateDatas if it becomes hard to directly compare two different AgentStateDatas
         protected IBackingStore<TStateData, TTransitionData, TAgentStateData> frontier;
 
+        /// <summary>
+        /// Creates an Agent that can operate in an environment. All Agents try to minimize AgentStateData scores
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="backingStore"></param>
+        public Agent(String name, IBackingStore<TStateData, TTransitionData, TAgentStateData> backingStore)
+        {
+            this.Name = name;
+            this.currentState = null;
+            bestSeen = new Dictionary<StateToken<TStateData>, TAgentStateData>();
+            this.frontier = backingStore;
+        }
         private bool ExpandFrontier(AgentState<TStateData, TTransitionData, TAgentStateData> newState)
         {
             if (bestSeen.ContainsKey(newState.GetState())) //TODO: Change to account for non-certain state transition results
@@ -43,15 +56,31 @@ namespace AIWorld.Agent
             }
             return false;
         }
-        public Agent(String name, StateToken<TStateData> startingState, IBackingStore<TStateData, TTransitionData, TAgentStateData> backingStore)
+
+        public void SetStartState(StateToken<TStateData> startingState)
         {
-            this.Name = name;
-            this.currentState = new AgentState<TStateData, TTransitionData, TAgentStateData>(GetStartingStateData(startingState), startingState);
-            bestSeen = new Dictionary<StateToken<TStateData>, TAgentStateData>();
-            this.frontier = backingStore;
+            if (currentState != null)
+            {
+                throw new Exception("Starting State Allocation: Starting State Already Set");
+            }
+            currentState = new AgentState<TStateData, TTransitionData, TAgentStateData>(GetStartingStateData(startingState), startingState);
         }
-        public StateToken<TStateData> GetState() { return currentState.GetState(); }
-        protected AgentState<TStateData, TTransitionData, TAgentStateData> GetAgentState() { return currentState; }
+        public StateToken<TStateData> GetState() 
+        { 
+            if (currentState == null)
+            {
+                throw new Exception("State Access: Starting State Not Set");
+            }
+            return currentState.GetState(); 
+        }
+        protected AgentState<TStateData, TTransitionData, TAgentStateData> GetAgentState() 
+        { 
+            if (currentState == null)
+            {
+                throw new Exception("Agent State Access: Starting State Not Set");
+            }
+            return currentState; 
+        }
         public TransitionToken<TStateData, TTransitionData> SelectMove(HashSet<TransitionToken<TStateData, TTransitionData>> choices)
         {
             foreach (TransitionToken<TStateData, TTransitionData> transition in choices)
@@ -80,9 +109,13 @@ namespace AIWorld.Agent
             }
             Console.Write(message);
         }
-
         public void Display()
         {
+            if (currentState == null)
+            {
+                throw new Exception("Invalid Display: Starting State Not Set");
+            }
+
             Console.WriteLine($"{Name}: ");
             List<AgentState<TStateData, TTransitionData, TAgentStateData>> path = currentState.GetPath();
             
@@ -96,7 +129,7 @@ namespace AIWorld.Agent
             Console.WriteLine();
 
             Console.Write("     TransitionData: ");
-            Console.Write(" ");
+            Console.Write("   ");
             for (int i = 1; i < path.Count; i++)
             {
                 Console.Write(", ");
@@ -113,9 +146,12 @@ namespace AIWorld.Agent
             }
 
         }
-
         public List<StateToken<TStateData>> GetCurrentPath()
         {
+            if (currentState == null)
+            {
+                throw new Exception("Invalid Path Calculation: Starting State Not Set");
+            }
             List<AgentState<TStateData, TTransitionData, TAgentStateData>> path = currentState.GetPath();
             List<StateToken<TStateData>> returnList = new();
             foreach(var state in path)

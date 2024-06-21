@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace AIWorld.Environment
 {
-    public interface ITransition<TStateData, TTransitionData> //TODO: Make transitions have chances to allow for games with uncertain moves
+    public interface ITransition<TState, TStateData, TTransitionData> //TODO: Make transitions have chances to allow for games with uncertain moves
+        where TState : IState<TStateData>
     {
-        public TTransitionData GetData();
-        public IState<TStateData> GetStartState();
-        public IState<TStateData> GetEndState();
+       TTransitionData GetData();
+       TState GetStartState();
+       TState GetEndState();
     }
 }

@@ -1,5 +1,4 @@
-﻿Remove public from interfaces
-Potentially remove IEnvironment
-Make agents run with a function that takes in environments
-Make more agents
+﻿Make more agents
 Implement chance
+
+Control f ":Uncomment"
