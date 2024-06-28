@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace AIWorld.Environment
 {
 
-    public abstract class Environment<TState, TStateData, TTransition, TTransitionData>
+    public abstract class EnvironmentOld<TState, TStateData, TTransition, TTransitionData>
         where TState : IState<TStateData>
         where TTransition : ITransition<TState, TStateData, TTransitionData>
     {
@@ -24,7 +24,7 @@ namespace AIWorld.Environment
         public List<IAgent<TStateData, TTransitionData>> Agents;
         public List<TState> AgentPositions;
 
-        public Environment()
+        public EnvironmentOld()
         {
             tokenToState = new Dictionary<StateToken<TStateData>, TState>();
             transitionToState = new Dictionary<TransitionToken<TStateData, TTransitionData>, TTransition>();
@@ -132,9 +132,8 @@ namespace AIWorld.Environment
 
         protected virtual TransitionToken<TStateData, TTransitionData> GenerateToken(TTransition transition)
         {
-            StateToken<TStateData> startStateToken = GenerateToken(transition.GetStartState());
             StateToken<TStateData> endStateToken = GenerateToken(transition.GetEndState());
-            TransitionToken<TStateData, TTransitionData> newToken = new TransitionToken<TStateData, TTransitionData>(transition.GetData(), startStateToken, endStateToken);
+            TransitionToken<TStateData, TTransitionData> newToken = new TransitionToken<TStateData, TTransitionData>(transition.GetData(), endStateToken);
             transitionToState.Add(newToken, transition);
             return newToken;
         }

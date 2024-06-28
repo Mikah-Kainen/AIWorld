@@ -1,0 +1,41 @@
+﻿
+									AI World
+-----------------------------------------------------------------------------------
+
+High-Level Description:
+	AI World is an agent training environment where agents can take actions in simulated worlds.
+	Agents interact with the environment through select APIs.
+
+Environment API:
+	RegisterAgent:
+		-Returns: The ID of the agent
+		-Parameters: The starting data of the agent, The permissions of the agent
+		-Requirements: The starting data is valid
+	GetMoves:
+		-Returns: The moves available to an agent
+		-Parameters: Agent
+		-Requirements: Agent is in the environment
+	GetMoves:
+		-Returns: The moves available from a state
+		-Parameters: Agent, State
+		-Requirements: Agent is in the environment, Agent has permission to view future states, State is valid
+	MakeMove:
+		-Returns: The new state of an agent
+		-Parameters: Agent, Move
+		-Requirements: Agent is in the environment, Move is valid, Agent has permission to make the move
+	Sense (See, Scan, Read, Etc...):
+		-Returns: The sensed information about the agent's current state
+		-Parameters: Agent, Sense
+		-Requirements: Agent is in the environment, Agent has permission to use the sense
+	Sense (See, Scan, Read, Etc...):
+		-Returns: The sensed information about a state
+		-Parameters: Agent, Sense, State
+		-Requirements: Agent is in the environment, State is valid, Agent has permission to use the sense, Agent has permission to view future states
+	Sense (See, Scan, Read, Etc...):
+		-Returns: The sensed information about a move
+		-Parameters: Agent, Sense, Move
+		-Requirements: Agent is in the environment, Move is valid, Agent has permission to use the sense
+	GetPermissions:
+		-Returns: The permissions of an Agent
+		-Parameters: Agent
+		-Requirements: Agent is in the environment

@@ -1,0 +1,13 @@
+﻿
+In a 4 by 3 grid, there is a firepit("F"), a cheese("C"), and a wall(W).
+As a mouse, pathfind to the cheese without hitting the wall. 
+However, there's a twist! 
+Each move has an 80% chance of going in the target direction and a 10% chance of going to each side.
+If you go into a wall or a border, you stay where you are.
+What is the first move from start("S")
+ _______________
+|___|___|___|_C_|
+|___|_W_|_S_|_F_|
+|___|___|___|___|
+
+Answer: Walk into the wall! This guarentees avoiding the fire until you can safely move to the cheese.

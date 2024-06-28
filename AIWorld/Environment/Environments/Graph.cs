@@ -75,7 +75,7 @@ namespace AIWorld.Environment.Environments
         public TNode GetEndNode() => GetEndState();
     }
 
-    public class Graph<TNodeData, TEdgeData> : Environment<Node<TNodeData, TEdgeData>, TNodeData, Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>, TEdgeData>
+    public class Graph<TNodeData, TEdgeData> : EnvironmentOld<Node<TNodeData, TEdgeData>, TNodeData, Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>, TEdgeData>
     {
         private HashSet<Node<TNodeData, TEdgeData>> nodes;
         private HashSet<Edge<Node<TNodeData, TEdgeData>, TNodeData, TEdgeData>> edges;

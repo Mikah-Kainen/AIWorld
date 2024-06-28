@@ -1,0 +1,13 @@
+﻿
+This problem adds chance to a Tic Tac Toe board so that;
+	-placing a mark in the middle has a %25 chance to succeed,
+	-Placing a mark in the corners has a %50 chance to succeed,
+	-Placing a mark in the remaining squares has a %100 to succeed
+
+For an ExpectiMax, to prevent infinite depth, we add one more rule:
+	-After missing a mark, the next mark that agent places is guarenteed to succeed
+
+ ___ ___ ___
+| 50|100| 50|
+|100| 25|100|
+| 50|100| 50|

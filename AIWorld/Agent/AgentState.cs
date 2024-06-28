@@ -24,7 +24,7 @@ namespace AIWorld.Agent
             this.currentState = currentState;
         }
 
-        public AgentState(TAgentStateData agentStateData, StateToken<TStateData> currentState) : this(null, agentStateData, new TransitionToken<TStateData, TTransitionData>(default, null, currentState), currentState) { }
+        public AgentState(TAgentStateData agentStateData, StateToken<TStateData> currentState) : this(null, agentStateData, new TransitionToken<TStateData, TTransitionData>(default, currentState), currentState) { }
 
         public AgentState<TStateData, TTransitionData, TAgentStateData> GetPreviousState() { return previousState; }
         public TAgentStateData GetAgentStateData() { return agentStateData; }
